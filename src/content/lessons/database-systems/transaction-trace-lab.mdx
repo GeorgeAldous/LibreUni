@@ -3,6 +3,7 @@ title: "Transaction Trace Lab"
 course: "database-systems"
 description: "Trace concurrent transactions and recovery decisions."
 ---
+import Quiz from '../../../components/Quiz';
 # Transaction Trace Lab
 
 This lab turns transaction theory into a notation and debugging discipline. A transaction is not merely a list of SQL statements: it is a history of reads, predicate checks, writes, lock acquisitions, log records, waits, commits, and effects that may become visible to other sessions. Your job is to construct histories, determine which observations are possible, and state the smallest mechanism that prevents an unacceptable outcome. Always name the database engine and isolation implementation you are modelling. SQL isolation-level names are not enough because engines may implement the same label differently.
@@ -27,7 +28,35 @@ An MVCC trace instead records the version visible to each snapshot. If row `x` h
 
 Initial state is `inventory(sku='A', stock=10)`. T1 and T2 each execute `SELECT stock`, compute `stock-7`, then issue an update based on the value read. A possible read-committed history is `r1[10], r2[10], w1[3], c1, w2[3], c2`. The final value is 3 even though 14 units were promised. Each individual write is valid, but the read-modify-write protocol lost T1's decrement.
 
+Before repairing, fill in the five columns for one interleaving so the mechanism becomes visible. Here is the lost-update history rendered as a worked trace under read committed:
+
+| Operation | Session state | Locks/snapshot | Visible DB state | Explanation |
+| --- | --- | --- | --- | --- |
+| T1: `SELECT stock` | sees 10 | read committed snapshot | inventory(stock=10) | T1 reads the current committed value |
+| T2: `SELECT stock` | sees 10 | separate snapshot | inventory(stock=10) | T2 reads 10 too; no conflict yet |
+| T1: `UPDATE ... SET stock=3` | write set | X-lock on row | inventory(stock=3) | T1 writes 10-7=3 and holds an exclusive lock |
+| T1: `COMMIT` | committed | releases locks | inventory(stock=3) | logical commit; T2's earlier read is now stale |
+| T2: `UPDATE ... SET stock=3` | write set | X-lock | inventory(stock=3) | T2 writes based on the stale read of 10 |
+| T2: `COMMIT` | committed | — | inventory(stock=3) | final visible value is 3; T1's decrement is lost |
+
+The decisive column is the one titled *Visible DB state*: the loss is not an anomaly of a single write but a product of the stale read combined with an overwriting write. A good report hunts for exactly this kind of divergence point.
+
+Which facts does this trace establish, and which does it still leave open? Engage with the distinction before continuing.
+
 Repair options have different semantics. `UPDATE inventory SET stock=stock-7 WHERE sku='A' AND stock at least 7` makes the arithmetic atomic and causes the second statement to affect zero rows; the caller must inspect the row count. A `SELECT ... FOR UPDATE` serializes the read-modify-write pair. An optimistic version column uses `WHERE sku='A' AND version=:old_version`; a zero row count means retry. A serializable transaction may abort one participant. Explain why a plain `SELECT` followed by a plain `UPDATE` is not equivalent to any of these.
+
+<Quiz client:load
+  title="Read-your-writes and lost updates"
+  question="In the Trace A history under read committed, why does a plain `SELECT` followed by a plain `UPDATE` fail to prevent the lost update, while `SELECT ... FOR UPDATE` (or an atomic `SET stock=stock-7 WHERE ... AND stock>=7`) succeeds?"
+  options={[
+    "Because the plain version reads within the same statement each time, so the snapshot is automatically refreshed",
+    "Because the lost update is caused by the programmer computing stock-7 in application code; it is fixed only by moving the decrement into the SQL expression or by holding a lock across the read-modify-write pair",
+    "Because `UPDATE` always writes 10-7 regardless of the concurrent value it read",
+    "Because read committed never allows two transactions to read the same row"
+  ]}
+  correctIndex={1}
+  explanation="Under read committed, the plain SELECT returns 10 to both sessions; nothing prevents each from using that stale value. The repair works when the read and the guarded write are atomic (a single conditional UPDATE), serialized against other readers of the same row (FOR UPDATE), or retried on a version conflict. Choosing the right primitive is the learning outcome of this section."
+/>
 
 ## 4. Trace B: write skew and predicate protection
 
