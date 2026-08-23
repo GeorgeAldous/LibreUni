@@ -4,6 +4,7 @@ course: "database-systems"
 description: "Trace concurrent transactions and recovery decisions."
 ---
 import Quiz from '../../../components/Quiz';
+
 # Transaction Trace Lab
 
 This lab turns transaction theory into a notation and debugging discipline. A transaction is not merely a list of SQL statements: it is a history of reads, predicate checks, writes, lock acquisitions, log records, waits, commits, and effects that may become visible to other sessions. Your job is to construct histories, determine which observations are possible, and state the smallest mechanism that prevents an unacceptable outcome. Always name the database engine and isolation implementation you are modelling. SQL isolation-level names are not enough because engines may implement the same label differently.
