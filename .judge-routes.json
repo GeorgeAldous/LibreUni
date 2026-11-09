@@ -1,0 +1,1 @@
+{"summary": "Documentation-only change: adds a root-level CONTRIBUTING.md; no application code, layouts, or content were touched, so the home route is included only as a regression check.", "routes": [{"name": "home", "path": "/", "waitFor": "#main"}]}
