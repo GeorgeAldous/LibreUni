@@ -29,7 +29,7 @@ LibreUni is a completely free education platform — no sign-in, no ads, no payw
   - `<Quiz>`: `question`, `options`, `correctIndex`, `explanation`, `questions`, `title`
   - `<CodeRunner>`: `code`, `output`, `language`, `title`
   - `<CodeExercise>`: `code` (use `[!blank!]` for gaps), `answers`, `explanation`, `title`
-  - `<CaseStudy>`: `scenario`, `question`, `options`, `correctIndex`, `explanation`, `title`
+  - `<CaseStudy>`: `scenario`, `question`, `options`, `correctIndex`, `explanation`, `tradeoffs`, `title`
   - `<SqlRunner>`: `schema`, `initialQuery`, `title`, `description`
 - Write new custom components when existing ones don't fit.
 - Use PlantUML diagrams where visual representation genuinely aids understanding. See `docs/agent-rules/PLANTUML.md` for troubleshooting.

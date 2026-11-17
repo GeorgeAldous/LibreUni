@@ -16,6 +16,7 @@ interface CaseStudyProps {
   options?: (string | Option)[];
   correctIndex?: number;
   explanation?: string;
+  tradeoffs?: Array<{ label?: string; pros?: string; cons?: string }>;
   questions?: Array<{
     question?: string;
     options?: (string | Option)[];
@@ -36,6 +37,7 @@ export default function CaseStudy(props: CaseStudyProps) {
   const options = props.options?.length ? props.options : firstQuestion?.options || [];
   const correctIndex = props.correctIndex ?? firstQuestion?.correctIndex;
   const explanation = props.explanation || firstQuestion?.explanation || '';
+  const tradeoffs = props.tradeoffs || [];
 
   const normalizedOptions: Option[] = options.map((option, index) => {
     if (typeof option === 'string') {
@@ -94,6 +96,20 @@ export default function CaseStudy(props: CaseStudyProps) {
           <p className="print-static-explanation">
             <MathText>{explanation}</MathText>
           </p>
+        )}
+        {tradeoffs.length > 0 && (
+          <div className="print-static-tradeoffs">
+            <strong>Design trade-offs:</strong>
+            <ul>
+              {tradeoffs.map((tradeoff, idx) => (
+                <li key={idx}>
+                  {tradeoff.label && <strong>{tradeoff.label}.</strong>}{' '}
+                  {tradeoff.pros && <span>Pros: <MathText>{tradeoff.pros}</MathText>{' '}</span>}
+                  {tradeoff.cons && <span>Cons: <MathText>{tradeoff.cons}</MathText></span>}
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
 
@@ -243,6 +259,35 @@ export default function CaseStudy(props: CaseStudyProps) {
             {explanation && (
               <div className="feedback-info text-sm leading-relaxed text-light-text dark:text-dark-text">
                 <strong>Trade-off analysis:</strong> <MathText>{explanation}</MathText>
+              </div>
+            )}
+
+            {tradeoffs.length > 0 && (
+              <div className="rounded-lg border border-light-border bg-light-bg/70 p-3.5 dark:border-dark-border dark:bg-dark-bg/50">
+                <div className="mb-2 text-xs font-extrabold uppercase tracking-wider text-light-text dark:text-dark-text">
+                  Design trade-offs
+                </div>
+                <ul className="m-0 grid gap-2.5 p-0 text-sm leading-relaxed text-light-text dark:text-dark-text">
+                  {tradeoffs.map((tradeoff, idx) => (
+                    <li key={idx} className="list-none">
+                      {tradeoff.label && (
+                        <div className="font-semibold"><MathText>{tradeoff.label}</MathText></div>
+                      )}
+                      {tradeoff.pros && (
+                        <div className="text-light-muted dark:text-dark-muted">
+                          <span className="font-semibold text-emerald-600 dark:text-emerald-400">Pros:</span>{' '}
+                          <MathText>{tradeoff.pros}</MathText>
+                        </div>
+                      )}
+                      {tradeoff.cons && (
+                        <div className="text-light-muted dark:text-dark-muted">
+                          <span className="font-semibold text-rose-600 dark:text-rose-400">Cons:</span>{' '}
+                          <MathText>{tradeoff.cons}</MathText>
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
           </div>

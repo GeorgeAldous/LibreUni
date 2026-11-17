@@ -11,7 +11,7 @@ outcomes:
   - Distinguish an atomicity violation, a logical race, and an ISO C data race by the evidence each claim requires.
   - State a shared-state invariant, locate a valid linearization point, and construct a schedule that kills an incorrect implementation.
 omissions:
-  - Weak-memory executions, lock implementations, and acquire/release ordering are developed in the next lesson.
+  - Weak-memory executions, lock implementations, and acquire/release ordering belong to the shared-memory ordering lesson (Locks, Atomics, and Memory Ordering).
   - Distributed consistency and failure are outside this shared-memory model.
 estimatedMinutes: 330
 assessment: Given an unseen two- or three-thread implementation, state the invariant, derive the event constraints, enumerate or bound reachable outcomes, identify the first violating event, and defend one repair with a schedule that distinguishes it from a named wrong repair.
@@ -43,7 +43,7 @@ This lesson begins with a deliberately strong machine model:
 - a context switch may occur between the primitive events shown in the trace; and
 - no compiler or processor reorders those events.
 
-That is a **sequentially consistent trace model**, not a claim about C or RISC-V execution. It isolates the scheduling problem. The next lesson adds language-level data-race rules and weak hardware ordering.
+That is a **sequentially consistent trace model**, not a claim about C or RISC-V execution. It isolates the scheduling problem. Language-level data-race rules and weak hardware ordering are covered in the shared-memory ordering lesson (Locks, Atomics, and Memory Ordering).
 
 <PlantUML code={`
 @startuml
